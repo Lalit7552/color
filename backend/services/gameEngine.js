@@ -39,40 +39,65 @@ const startGameLoop = async () => {
       let minPayout = Infinity;
       let possibleWinningNumbers = []; 
 
-      if (currentGame && currentGame.adminManualResult !== undefined && currentGame.adminManualResult !== null && currentGame.adminManualResult !== "") {
-          possibleWinningNumbers = [parseInt(currentGame.adminManualResult)];
-      } else {
-          // Calculate liability for each number (With 20% Profit Fee Logic)
-          for (let i = 0; i < 10; i++) {
-            let currentPayout = 0;
-            const outcome = outcomes[i];
+      // 1. Admin Override filtering (Smart Logic)
+      let validNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-            periodBets.forEach(bet => {
-              if (bet.type === 'number' && bet.number === i) {
-                currentPayout += bet.amount * 7.4; // 20% fee on profit
-              }
-              if (bet.type === 'size' && bet.size === outcome.size) {
-                currentPayout += bet.amount * 1.8; // 20% fee on profit
-              }
-              if (bet.type === 'color' && outcome.colors.includes(bet.color)) {
-                if (bet.color === 'violet') {
-                  currentPayout += bet.amount * 3.8; // 20% fee on profit
-                } else if (outcome.colors.includes('violet')) {
-                  currentPayout += bet.amount * 1.4; // 20% fee on profit
-                } else {
-                  currentPayout += bet.amount * 1.8; // 20% fee on profit
-                }
-              }
-            });
-
-            if (currentPayout < minPayout) {
-              minPayout = currentPayout;
-              possibleWinningNumbers = [i]; 
-            } 
-            else if (currentPayout === minPayout) {
-              possibleWinningNumbers.push(i);
+      if (currentGame) {
+        if (currentGame.adminManualNumber !== undefined && currentGame.adminManualNumber !== null && currentGame.adminManualNumber !== "") {
+          validNumbers = [parseInt(currentGame.adminManualNumber)];
+        } else {
+          if (currentGame.adminManualColor) {
+            validNumbers = validNumbers.filter(n => outcomes[n].colors.includes(currentGame.adminManualColor));
+          }
+          if (currentGame.adminManualSize) {
+            validNumbers = validNumbers.filter(n => outcomes[n].size === currentGame.adminManualSize);
+          }
+          
+          // Old code support (agar sirf adminManualResult string ho)
+          if (validNumbers.length === 10 && currentGame.adminManualResult) {
+            const val = currentGame.adminManualResult;
+            if (['red', 'green', 'violet'].includes(val)) {
+              validNumbers = validNumbers.filter(n => outcomes[n].colors.includes(val));
+            } else if (!isNaN(parseInt(val))) {
+              validNumbers = [parseInt(val)];
             }
           }
+        }
+        
+        // Agar admin galat combination chunta hai (jaise green color par number 2) toh wapas default kardo
+        if (validNumbers.length === 0) validNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+      }
+
+      // 2. Calculate liability ONLY for valid numbers
+      for (let i of validNumbers) {
+        let currentPayout = 0;
+        const outcome = outcomes[i];
+
+        periodBets.forEach(bet => {
+          if (bet.type === 'number' && Number(bet.number) === i) {
+            currentPayout += bet.amount * 7.4; // 20% fee on profit
+          }
+          if (bet.type === 'size' && bet.size === outcome.size) {
+            currentPayout += bet.amount * 1.8; // 20% fee on profit
+          }
+          if (bet.type === 'color' && outcome.colors.includes(bet.color)) {
+            if (bet.color === 'violet') {
+              currentPayout += bet.amount * 3.8; // 20% fee on profit
+            } else if (outcome.colors.includes('violet')) {
+              currentPayout += bet.amount * 1.4; // 20% fee on profit
+            } else {
+              currentPayout += bet.amount * 1.8; // 20% fee on profit
+            }
+          }
+        });
+
+        if (currentPayout < minPayout) {
+          minPayout = currentPayout;
+          possibleWinningNumbers = [i]; 
+        } 
+        else if (currentPayout === minPayout) {
+          possibleWinningNumbers.push(i);
+        }
       }
 
       const winningNumber = possibleWinningNumbers[Math.floor(Math.random() * possibleWinningNumbers.length)];

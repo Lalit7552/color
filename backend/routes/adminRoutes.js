@@ -73,7 +73,7 @@ router.get("/dashboard/stats", verifyAdminToken, async (req, res) => {
 
 /* 3. 🔥 ADMIN SET MANUAL RESULT (Secure) */
 router.post("/set-result", verifyAdminToken, async (req, res) => {
-  const { period, color } = req.body;
+  const { period, color, size, number } = req.body;
 
   // Check agar admin purane ya galat period ka result set kar raha ho
   if (period !== gameState.currentPeriod) {
@@ -83,15 +83,32 @@ router.post("/set-result", verifyAdminToken, async (req, res) => {
     });
   }
 
+  // Check karein ki at least koi ek value bheji gayi ho
+  if (!color && !size && !number) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "Please provide color, size, or number" 
+    });
+  }
+
   try {
+    // Jo data aaya hai sirf wahi update karna hai
+    const updateFields = {};
+    if (color) {
+      updateFields.adminManualColor = color;
+      updateFields.adminManualResult = color; // Purane logic ke liye backup
+    }
+    if (size) updateFields.adminManualSize = size;
+    if (number) updateFields.adminManualNumber = number;
+
     await Game.findOneAndUpdate(
       { period: period },
-      { adminManualResult: color },
+      { $set: updateFields },
       { upsert: true }
     );
     return res.json({ 
       success: true, 
-      message: `Period ${period} me ${color.toUpperCase()} set ho gaya hai!` 
+      message: `Period ${period} ka manual result set ho gaya!` 
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: "Database Error" });
