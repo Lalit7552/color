@@ -104,7 +104,7 @@ router.post("/set-result", verifyAdminToken, async (req, res) => {
     await Game.findOneAndUpdate(
       { period: period },
       { $set: updateFields },
-      { upsert: true }
+      { upsert: true, strict: false } // 🔥 strict mode off kiya taaki naye variables DB me save ho jayein
     );
     return res.json({ 
       success: true, 

@@ -17,7 +17,7 @@ const startGameLoop = async () => {
       const currentPeriod = gameState.currentPeriod;
       
       const periodBets = await Bet.find({ period: currentPeriod, status: "pending" });
-      const currentGame = await Game.findOne({ period: currentPeriod });
+      const currentGame = await Game.findOne({ period: currentPeriod }).lean(); // 🔥 .lean() lagaya taaki non-schema fields mil sakein
 
       // ==========================================
       // 🔥 ADMIN PROFIT LOGIC (LOWEST LIABILITY)
