@@ -25,7 +25,7 @@ export default function Navbar() {
       const token = localStorage.getItem("token");
       if (token) {
         try {
-          const { data } = await axios.get("http://localhost:5000/api/auth/me", {
+          const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/auth/me`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           setBalance(data.balance || 0);
@@ -49,7 +49,7 @@ export default function Navbar() {
             onClick={() => setIsSidebarOpen(true)}
             className="p-1 text-gray-300 hover:text-yellow-400 transition-colors z-10"
           >
-            <Menu className="w-7 h-7" />
+            <Menu className="w-6 h-6 sm:w-7 sm:h-7" />
           </button>
 
           {/* 2. Center: Game Icon & Name (Perfectly Centered) */}
@@ -57,20 +57,23 @@ export default function Navbar() {
             className="absolute inset-0 flex items-center justify-center cursor-pointer pointer-events-none"
           >
             <div
-              className="flex items-center gap-2 pointer-events-auto"
+              className="flex items-center gap-1 sm:gap-2 pointer-events-auto"
               onClick={() => navigate("/home")}
             >
-              <Gamepad2 className="w-8 h-8 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]" />
-              <h1 className="text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200">
+              <Gamepad2 className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]" />
+              <h1 className="text-lg sm:text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200">
                 COLOR WIN
               </h1>
             </div>
           </div>
 
-          {/* 3. Right: User Wallet/Balance (Optional Gaming Feel) */}
+          {/* 3. Right: User Wallet/Balance (Responsive Fix) */}
           <button className="p-1 text-gray-300 hover:text-yellow-400 transition-colors z-10 flex items-center gap-1">
-            <Coins className="w-6 h-6 text-yellow-400" />
-            <span className="font-bold text-yellow-400 hidden sm:block">₹{balance.toFixed(2)}</span>
+            <Coins className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
+            {/* 🛑 'hidden sm:block' हटा दिया गया है, अब यह मोबाइल पर भी दिखेगा */}
+            <span className="font-bold text-yellow-400 text-sm sm:text-base">
+              ₹{balance.toFixed(2)}
+            </span>
           </button>
 
         </div>
@@ -120,7 +123,7 @@ export default function Navbar() {
             <button onClick={() => navItemClick("/bethistory")} className="w-full flex items-center gap-4 text-gray-300 hover:text-yellow-400 hover:bg-gray-800/50 p-3 rounded-xl transition-all">
               <History className="w-5 h-5" /> <span className="font-semibold">Game History</span>
             </button>
-             <button
+            <button
               onClick={() => navItemClick("/transaction")}
               className="w-full flex items-center gap-4 text-gray-300 hover:text-yellow-400 hover:bg-gray-800/50 p-3 rounded-xl transition-all"
             >
@@ -131,16 +134,6 @@ export default function Navbar() {
               <User className="w-5 h-5" /> <span className="font-semibold">Profile</span>
             </button>
            
-          </div>
-
-          {/* Logout Button (Pushed to bottom) */}
-          <div className="mt-auto">
-            {/* <button
-              onClick={logout}
-              className="w-full flex items-center justify-center gap-2 text-red-100 font-bold bg-red-600/80 hover:bg-red-500 p-4 rounded-xl transition-all shadow-[0_0_15px_rgba(220,38,38,0.4)]"
-            >
-              <LogOut className="w-5 h-5" /> Logout
-            </button> */}
           </div>
         </div>
       </div>

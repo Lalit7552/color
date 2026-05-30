@@ -38,7 +38,7 @@ export default function BetHistory() {
       }
 
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/game/my-history/${userId}`);
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/game/my-history/${userId}`);
         
         if (data.success) {
           setBetHistory(data.data);

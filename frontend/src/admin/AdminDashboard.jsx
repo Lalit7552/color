@@ -12,7 +12,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchGameStatus = async () => {
       try {
-        const { data } = await axios.get("http://localhost:5000/api/game/status");
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/game/status`);
         if (data.success) {
           // Jaise hi naya period shuru ho, purana selection clear kar do
           if (period !== data.period) {
@@ -43,7 +43,7 @@ export default function AdminDashboard() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/admin/set-result",
+        `${import.meta.env.VITE_API_URL}/admin/set-result`,
         { period: period, color: color },
         { headers: { Authorization: `Bearer ${token}` } }
       );

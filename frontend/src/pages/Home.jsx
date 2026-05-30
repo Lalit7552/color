@@ -26,7 +26,7 @@ export default function Home() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const { data } = await axios.get("http://localhost:5000/api/game/status");
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/game/status`);
         if (data.success) {
           setTimeLeft(data.timeLeft);
           setPeriod(data.period);
@@ -49,7 +49,7 @@ export default function Home() {
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        const { data } = await axios.get("http://localhost:5000/api/game/results");
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/game/results`);
         if (data.success) {
           setGameResults(data.data);
         }
@@ -62,7 +62,7 @@ export default function Home() {
     return () => clearInterval(resultTimer);
   }, []);
 
-  // 5. Poll for User Bet Results
+  // 3. Poll for User Bet Results
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     if (!userId) return;
@@ -72,7 +72,7 @@ export default function Home() {
 
     const checkUserResult = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/game/my-history/${userId}`);
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/game/my-history/${userId}`);
         if (data.success && data.data.length > 0) {
           const latestBet = data.data[0]; 
           
@@ -100,13 +100,13 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // 6. Fetch User Balance
+  // 4. Fetch User Balance
   useEffect(() => {
     const fetchBalance = async () => {
       const userId = localStorage.getItem("userId");
       if (!userId) return;
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/game/user-details/${userId}`);
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/game/user-details/${userId}`);
         if (data.success && data.data) {
           setBalance(data.data.balance || 0);
         }
@@ -117,7 +117,7 @@ export default function Home() {
     fetchBalance();
   }, [isModalOpen, winLossPopup]); // Refresh when modal opens or win/loss popup appears
 
-  // 3. Open Bet Modal (Chart)
+  // 5. Open Bet Modal (Chart)
   const handleOpenModal = (type, value, colorCode) => {
     if (isLocked) return;
     setBetSelection({ type, value, colorCode });
@@ -126,7 +126,7 @@ export default function Home() {
     setIsModalOpen(true);
   };
 
-  // 4. Confirm & Place Bet
+  // 6. Confirm & Place Bet
   const handleConfirmBet = async () => {
     const userId = localStorage.getItem("userId");
     const totalAmount = baseAmount * quantity;
@@ -147,7 +147,7 @@ export default function Home() {
     else payload.value = betSelection.value;
 
     try {
-      const { data } = await axios.post("http://localhost:5000/api/game/place-bet", payload);
+      const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/game/place-bet`, payload);
       
       if (data.success) {
         alert(`✅ Bet Placed Successfully on ${betSelection.value.toString().toUpperCase()} for ₹${totalAmount}!`);
@@ -254,23 +254,23 @@ export default function Home() {
             )}
           </h3>
 
-          <div className="flex justify-between gap-3">
-            <button onClick={() => handleOpenModal("color", "green", "bg-green-500")} disabled={isLocked} className={`flex-1 bg-gradient-to-b from-green-500 to-green-600 text-white py-4 rounded-xl font-black transition-all border border-green-400/30 flex flex-col items-center justify-center gap-1 ${isLocked ? "opacity-40 cursor-not-allowed grayscale" : "shadow-[0_4px_15px_rgba(34,197,94,0.4)] hover:scale-105 active:scale-95"}`}>
+          <div className="flex justify-between gap-2 sm:gap-3">
+            <button onClick={() => handleOpenModal("color", "green", "bg-green-500")} disabled={isLocked} className={`flex-1 bg-gradient-to-b from-green-500 to-green-600 text-white py-3 sm:py-4 rounded-xl font-black text-sm sm:text-base transition-all border border-green-400/30 flex flex-col items-center justify-center gap-1 ${isLocked ? "opacity-40 cursor-not-allowed grayscale" : "shadow-[0_4px_15px_rgba(34,197,94,0.4)] hover:scale-105 active:scale-95"}`}>
               Join Green
             </button>
-            <button onClick={() => handleOpenModal("color", "violet", "bg-purple-500")} disabled={isLocked} className={`flex-1 bg-gradient-to-b from-purple-500 to-purple-600 text-white py-4 rounded-xl font-black transition-all border border-purple-400/30 flex flex-col items-center justify-center gap-1 ${isLocked ? "opacity-40 cursor-not-allowed grayscale" : "shadow-[0_4px_15px_rgba(168,85,247,0.4)] hover:scale-105 active:scale-95"}`}>
+            <button onClick={() => handleOpenModal("color", "violet", "bg-purple-500")} disabled={isLocked} className={`flex-1 bg-gradient-to-b from-purple-500 to-purple-600 text-white py-3 sm:py-4 rounded-xl font-black text-sm sm:text-base transition-all border border-purple-400/30 flex flex-col items-center justify-center gap-1 ${isLocked ? "opacity-40 cursor-not-allowed grayscale" : "shadow-[0_4px_15px_rgba(168,85,247,0.4)] hover:scale-105 active:scale-95"}`}>
               Join Violet
             </button>
-            <button onClick={() => handleOpenModal("color", "red", "bg-red-500")} disabled={isLocked} className={`flex-1 bg-gradient-to-b from-red-500 to-red-600 text-white py-4 rounded-xl font-black transition-all border border-red-400/30 flex flex-col items-center justify-center gap-1 ${isLocked ? "opacity-40 cursor-not-allowed grayscale" : "shadow-[0_4px_15px_rgba(239,68,68,0.4)] hover:scale-105 active:scale-95"}`}>
+            <button onClick={() => handleOpenModal("color", "red", "bg-red-500")} disabled={isLocked} className={`flex-1 bg-gradient-to-b from-red-500 to-red-600 text-white py-3 sm:py-4 rounded-xl font-black text-sm sm:text-base transition-all border border-red-400/30 flex flex-col items-center justify-center gap-1 ${isLocked ? "opacity-40 cursor-not-allowed grayscale" : "shadow-[0_4px_15px_rgba(239,68,68,0.4)] hover:scale-105 active:scale-95"}`}>
               Join Red
             </button>
           </div>
 
-          <div className="flex justify-between gap-3 mt-4">
-            <button onClick={() => handleOpenModal("size", "big", "bg-orange-500")} disabled={isLocked} className={`flex-1 bg-gradient-to-b from-orange-400 to-orange-500 text-white py-4 rounded-xl font-black transition-all border border-orange-300/30 flex flex-col items-center justify-center gap-1 ${isLocked ? "opacity-40 cursor-not-allowed grayscale" : "shadow-[0_4px_15px_rgba(249,115,22,0.4)] hover:scale-105 active:scale-95"}`}>
+          <div className="flex justify-between gap-2 sm:gap-3 mt-4">
+            <button onClick={() => handleOpenModal("size", "big", "bg-orange-500")} disabled={isLocked} className={`flex-1 bg-gradient-to-b from-orange-400 to-orange-500 text-white py-3 sm:py-4 rounded-xl font-black text-sm sm:text-base transition-all border border-orange-300/30 flex flex-col items-center justify-center gap-1 ${isLocked ? "opacity-40 cursor-not-allowed grayscale" : "shadow-[0_4px_15px_rgba(249,115,22,0.4)] hover:scale-105 active:scale-95"}`}>
               Join Big
             </button>
-            <button onClick={() => handleOpenModal("size", "small", "bg-blue-500")} disabled={isLocked} className={`flex-1 bg-gradient-to-b from-blue-400 to-blue-500 text-white py-4 rounded-xl font-black transition-all border border-blue-300/30 flex flex-col items-center justify-center gap-1 ${isLocked ? "opacity-40 cursor-not-allowed grayscale" : "shadow-[0_4px_15px_rgba(59,130,246,0.4)] hover:scale-105 active:scale-95"}`}>
+            <button onClick={() => handleOpenModal("size", "small", "bg-blue-500")} disabled={isLocked} className={`flex-1 bg-gradient-to-b from-blue-400 to-blue-500 text-white py-3 sm:py-4 rounded-xl font-black text-sm sm:text-base transition-all border border-blue-300/30 flex flex-col items-center justify-center gap-1 ${isLocked ? "opacity-40 cursor-not-allowed grayscale" : "shadow-[0_4px_15px_rgba(59,130,246,0.4)] hover:scale-105 active:scale-95"}`}>
               Join Small
             </button>
           </div>
@@ -303,7 +303,6 @@ export default function Home() {
         </div>
 
         {/* 📊 Global Game Results (Paginated) */}
-        {/* 📊 Global Game Results (Paginated) */}
         <div className="bg-gray-900/80 backdrop-blur-md rounded-2xl p-5 border border-gray-700/50">
           <h3 className="text-white font-bold mb-4 flex items-center gap-2">
             <Trophy className="w-5 h-5 text-yellow-400" /> Game Results
@@ -314,8 +313,8 @@ export default function Home() {
               <thead className="bg-gray-800 text-gray-400">
                 <tr>
                   <th className="py-3 px-2 font-medium">Period</th>
-                  <th className="py-3 px-2 font-medium">Number</th> {/* 🔥 Naya Column */}
-                  <th className="py-3 px-2 font-medium">Color</th>  {/* 🔥 Naya Column */}
+                  <th className="py-3 px-2 font-medium">Number</th> 
+                  <th className="py-3 px-2 font-medium">Color</th>  
                   <th className="py-3 px-2 font-medium">Size</th>
                 </tr>
               </thead>
@@ -380,7 +379,6 @@ export default function Home() {
                   })
                 ) : (
                   <tr>
-                    {/* Colspan 4 kar diya kyunki ab 4 columns hain */}
                     <td colSpan="4" className="py-4 text-gray-500">No results found</td> 
                   </tr>
                 )}
@@ -417,7 +415,7 @@ export default function Home() {
 
       {/* 🚀 Betting Modal (Chart) */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-black/60 backdrop-blur-sm p-4 pb-24 md:p-4 animate-in fade-in duration-200">
           <div className="bg-gray-900 w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl border border-gray-700 overflow-hidden transform transition-all translate-y-0">
             
             {/* Modal Header */}
@@ -440,12 +438,12 @@ export default function Home() {
               {/* Contract Money Selection */}
               <div>
                 <p className="text-gray-400 text-sm font-semibold mb-3">Contract Money</p>
-                <div className="flex justify-between gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   {[10, 100, 1000, 10000].map((amt) => (
                     <button 
                       key={amt}
                       onClick={() => setBaseAmount(amt)}
-                      className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all border ${
+                      className={`py-2 px-1 rounded-lg font-bold text-xs sm:text-sm transition-all border truncate ${
                         baseAmount === amt 
                           ? `${betSelection.colorCode.includes('gradient') ? 'text-white' : betSelection.colorCode.replace('bg-', 'text-')} border-current bg-gray-800` 
                           : "text-gray-500 border-gray-700 bg-gray-800/50 hover:bg-gray-800"
@@ -460,10 +458,10 @@ export default function Home() {
               {/* Quantity Selection */}
               <div>
                 <p className="text-gray-400 text-sm font-semibold mb-3">Multiplier (Quantity)</p>
-                <div className="flex items-center gap-4 bg-gray-800 p-2 rounded-xl border border-gray-700">
+                <div className="flex items-center justify-between gap-2 bg-gray-800 p-2 rounded-xl border border-gray-700">
                   <button 
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white transition"
+                    className="w-10 h-10 flex shrink-0 items-center justify-center bg-gray-700 hover:bg-gray-600 rounded-lg text-white transition"
                   >
                     <Minus className="w-5 h-5" />
                   </button>
@@ -471,11 +469,11 @@ export default function Home() {
                     type="number"
                     value={quantity}
                     onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
-                    className="flex-1 bg-transparent text-center text-xl font-bold text-white focus:outline-none"
+                    className="w-16 bg-transparent text-center text-xl font-bold text-white focus:outline-none"
                   />
                   <button 
                     onClick={() => setQuantity(quantity + 1)}
-                    className="p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white transition"
+                    className="w-10 h-10 flex shrink-0 items-center justify-center bg-gray-700 hover:bg-gray-600 rounded-lg text-white transition"
                   >
                     <Plus className="w-5 h-5" />
                   </button>

@@ -30,7 +30,7 @@ export default function Wallet() {
       const token = localStorage.getItem("token");
       if (token) {
         try {
-          const { data } = await axios.get("http://localhost:5000/api/auth/me", {
+          const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/auth/me`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           setBalance(data.balance || 0);
@@ -64,7 +64,7 @@ export default function Wallet() {
 
     try {
       // 1. Create Razorpay order on Backend
-      const { data: order } = await axios.post('http://localhost:5000/api/payment/create-order', { amount: Number(amount) });
+      const { data: order } = await axios.post(`${import.meta.env.VITE_API_URL}/payment/create-order`, { amount: Number(amount) });
 
       // 2. Razorpay configuration
       const options = {
@@ -77,7 +77,7 @@ export default function Wallet() {
         handler: async function (razorpayResponse) {
           // 3. Send payment verification to backend
           try {
-            const { data: verifyData } = await axios.post('http://localhost:5000/api/payment/verify', {
+            const { data: verifyData } = await axios.post(`${import.meta.env.VITE_API_URL}/payment/verify`, {
               ...razorpayResponse,
               userId,
               amount: Number(amount) // Send amount to backend

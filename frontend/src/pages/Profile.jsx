@@ -21,7 +21,7 @@ export default function Profile() {
         const userId = decodedToken.id; // Token se user ki MongoDB ID nikali
 
         // Backend se user ka data fetch karein
-        const response = await fetch(`/api/game/user-details/${userId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/game/user-details/${userId}`);
         const result = await response.json();
 
         if (result.success) {

@@ -21,7 +21,7 @@ export default function Transaction() {
         const userId = decodedToken.id;
 
         // Yahan par aap apne actual API endpoint ka path daalein
-        const response = await fetch(`http://localhost:5000/api/wallet/transactions/${userId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/wallet/transactions/${userId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
