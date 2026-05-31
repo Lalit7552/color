@@ -22,20 +22,37 @@ export default function Navbar() {
 
   useEffect(() => {
     const fetchUserBalance = async () => {
+      let userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
-      if (token) {
+      
+      // Agar userId nahi hai toh token se decode kar lein
+      if (!userId && token) {
         try {
-          const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/auth/me`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          setBalance(data.balance || 0);
-          localStorage.setItem("userId", data._id); // Razorpay verification ke waqt kaam aayega
+          userId = JSON.parse(atob(token.split('.')[1])).id;
+          localStorage.setItem("userId", userId);
+        } catch (e) {
+          console.error("Token decode error", e);
+          return;
+        }
+      }
+
+      if (userId) {
+        try {
+          const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/game/user-details/${userId}`);
+          if (data.success && data.data) {
+            setBalance(data.data.balance || 0);
+          }
         } catch (error) {
           console.error("Failed to fetch user balance", error);
         }
       }
     };
+
     fetchUserBalance();
+    
+    // 🔥 Har 3 seconds mein balance auto-refresh karega
+    const interval = setInterval(fetchUserBalance, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   return (

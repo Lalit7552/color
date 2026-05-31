@@ -39,6 +39,15 @@ export default function Login() {
       }
 
       localStorage.setItem("token", data.token);
+      
+      // Decode token to extract userId and save it to localStorage
+      try {
+        const userId = JSON.parse(atob(data.token.split('.')[1])).id;
+        localStorage.setItem("userId", userId);
+      } catch (err) {
+        console.error("Token decoding error", err);
+      }
+      
       navigate("/home");
 
     } catch (err) {

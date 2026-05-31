@@ -30,10 +30,11 @@ export default function Wallet() {
       const token = localStorage.getItem("token");
       if (token) {
         try {
-          const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/auth/me`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          setBalance(data.balance || 0);
+          const userId = JSON.parse(atob(token.split('.')[1])).id;
+          const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/game/user-details/${userId}`);
+          if (data.success && data.data) {
+            setBalance(data.data.balance || 0);
+          }
         } catch (error) {
           console.error("Balance fetch error:", error);
         }
@@ -111,7 +112,7 @@ export default function Wallet() {
     <div className="min-h-screen bg-[#0a0f1e] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900 via-[#0a0f1e] to-black font-sans pb-10">
       
       {/* 🚀 Header Navbar */}
-      <nav className="bg-gray-900/90 backdrop-blur-md border-b border-gray-700/50 p-4 sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+      <nav className="bg-gray-900/90 backdrop-blur-md border-b border-gray-700/50 p-4 sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex justify-between items-center">
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate(-1)} // Go back
@@ -120,6 +121,9 @@ export default function Wallet() {
             <ArrowLeft className="w-7 h-7" />
           </button>
           <h1 className="text-xl font-bold text-white tracking-wide">Deposit Funds</h1>
+        </div>
+        <div className="text-yellow-400 font-bold text-lg flex items-center gap-2">
+          <WalletIcon className="w-5 h-5" /> ₹{balance.toFixed(2)}
         </div>
       </nav>
 
